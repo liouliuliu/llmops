@@ -1,28 +1,31 @@
-import os
-
 from flask import Flask
 
+from config.config import Config
 from internal.exception import CustomException
 from internal.model import App
 from internal.router import Router
-from config.config import Config
-from pkg.http_code import HttpCode
-from pkg.response import json, Response
-from flask_sqlalchemy import SQLAlchemy
+from pkg.response.http_code import HttpCode
+from pkg.response.response import json, Response
+from pkg.sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
 class Http(Flask):
-    def __init__(self, *args, conf: Config, db: SQLAlchemy, router: Router, **kwargs):
+    def __init__(self,
+                 *args,
+                 conf: Config,
+                 db: SQLAlchemy,
+                 migrate:Migrate,
+                 router: Router,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         # 初始化应用配置
         self.config.from_object(conf)
         # 注册绑定异常错误
         self.register_error_handler(Exception, self._register_error_handler)
-        # 注册数据库
+        # 初始化 flask 扩展
         db.init_app(self)
-        with self.app_context():
-            _ = App()
-            db.create_all()
+        migrate.init_app(self,db,directory="internal/migration")
         # 注册应用路由
         router.register_router(self)
 

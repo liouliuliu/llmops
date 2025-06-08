@@ -2,7 +2,7 @@
 from dataclasses import field
 from typing import Any
 
-from pkg.response import HttpCode
+from pkg.response.http_code import HttpCode
 
 
 class CustomException(Exception):

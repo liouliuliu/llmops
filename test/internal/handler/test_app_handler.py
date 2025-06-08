@@ -1,6 +1,6 @@
 import pytest
 
-from pkg.http_code import HttpCode
+from pkg.response.http_code import HttpCode
 
 
 class TestAppHandler:
